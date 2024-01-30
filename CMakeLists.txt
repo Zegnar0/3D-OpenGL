@@ -49,3 +49,7 @@ endfunction(add_exercise)
 
 add_exercise(TP3_exo1_triangle_blanc)
 add_exercise(TP3_exo2_triangle_couleurs)
+add_exercise(TP3_exo3_structure_vertex)
+add_exercise(TP3_exo4_circle)
+add_exercise(TP3_exo5_index)
+add_exercise(TP4_exo1_test)

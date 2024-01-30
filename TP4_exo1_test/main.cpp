@@ -7,8 +7,8 @@ int main()
     ctx.maximize_window();
 
     const p6::Shader shader = p6::load_shader(
-    "shaders/triangle.vs.glsl",
-    "shaders/triangle.fs.glsl"
+    "shaders/grey2d.vs.glsl",
+    "shaders/grey2d.fs.glsl"
     );
 
     GLuint vbo;
@@ -28,8 +28,8 @@ int main()
     GLuint vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
-    static constexpr GLuint vertex_attr_position = 3;
-    static constexpr GLuint vertex_attr_color = 8;
+    static constexpr GLuint vertex_attr_position = 0;
+    static constexpr GLuint vertex_attr_color = 1;
     glEnableVertexAttribArray(vertex_attr_position);
     glEnableVertexAttribArray(vertex_attr_color);
 
