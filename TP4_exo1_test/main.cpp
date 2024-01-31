@@ -8,7 +8,7 @@ int main()
 
     const p6::Shader shader = p6::load_shader(
     "shaders/grey2d.vs.glsl",
-    "shaders/grey2d.fs.glsl"
+    "shaders/triangle.fs.glsl"
     );
 
     GLuint vbo;
