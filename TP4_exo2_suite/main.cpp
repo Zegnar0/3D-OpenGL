@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "glimac/default_shader.hpp"
 #include "p6/p6.h"
 
@@ -26,7 +27,7 @@ int main()
         {glm::vec2(0.0f, 1.f), glm::vec2(0.f, 0.f)}
     };
 
-    glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(Vertex2DUV), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(Vertex2DUV), vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -39,16 +40,19 @@ int main()
     glEnableVertexAttribArray(vertex_attr_UV);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glVertexAttribPointer(vertex_attr_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(Vertex2DUV), (const GLvoid*)(0 * sizeof(Vertex2DUV)));
-    glVertexAttribPointer(vertex_attr_UV, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(Vertex2DUV), (const GLvoid*)(2 * sizeof(Vertex2DUV)));
+    glVertexAttribPointer(vertex_attr_position, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2DUV), (const GLvoid*)offsetof(Vertex2DUV, position));
+    glVertexAttribPointer(vertex_attr_UV, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2DUV), (const GLvoid*)offsetof(Vertex2DUV, texture_uv));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+
+    GLint uLocat = glGetUniformLocation(shader.id(), "uTime");
 
     // Declare your infinite update loop.
     ctx.update = [&]() {
         glClear(GL_COLOR_BUFFER_BIT);
         glBindVertexArray(vao);
         shader.use();
+        glUniform1f(uLocat, ctx.time());
         glDrawArrays(GL_TRIANGLES, 0, 3);
         // glimac::bind_default_shader();
         glBindVertexArray(0);
