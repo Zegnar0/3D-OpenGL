@@ -10,7 +10,6 @@ uniform mat3 uModelMatrix;
 
 void main() {
     vFragUV = aVertexUV;
-    
     vVertexPosition = (uModelMatrix * vec3(aVertexPosition, 1.)).xy;
 
     gl_Position = vec4(vVertexPosition, 0.0, 2.0);
