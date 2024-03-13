@@ -56,8 +56,8 @@ int main()
     GLuint MoonTexture;
     try
     {
-        const std::string earthImagePath    = "assets/textures/MoonMap.jpg";
-        img::Image        earthTextureImage = p6::load_image_buffer(earthImagePath); // Utilisez la fonction de votre bibliothèque
+        const std::string MoonImagePath    = "assets/textures/MoonMap.jpg";
+        img::Image        MoonTextureImage = p6::load_image_buffer(MoonImagePath); // Utilisez la fonction de votre bibliothèque
 
         glGenTextures(1, &MoonTexture);
         glBindTexture(GL_TEXTURE_2D, MoonTexture);
@@ -67,7 +67,7 @@ int main()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, earthTextureImage.width(), earthTextureImage.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, earthTextureImage.data());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, MoonTextureImage.width(), MoonTextureImage.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, MoonTextureImage.data());
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -96,11 +96,13 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    GLuint uMVPMatrixLocation      = glGetUniformLocation(shader.id(), "uMVPMatrix");
-    GLuint uMVMatrixLocation       = glGetUniformLocation(shader.id(), "uMVMatrix");
-    GLuint uNormalMatrixLocation   = glGetUniformLocation(shader.id(), "uNormalMatrix");
-    GLuint uTextureSamplerLocation = glGetUniformLocation(shader.id(), "textureSampler");
+    GLuint uMVPMatrixLocation    = glGetUniformLocation(shader.id(), "uMVPMatrix");
+    GLuint uMVMatrixLocation     = glGetUniformLocation(shader.id(), "uMVMatrix");
+    GLuint uNormalMatrixLocation = glGetUniformLocation(shader.id(), "uNormalMatrix");
+    GLuint uTexture              = glGetUniformLocation(shader.id(), "uTexture");
+    GLint  uCloudTexture         = glGetUniformLocation(shader.id(), "uCloudTexture");
     glEnable(GL_DEPTH_TEST);
+    // glUniform1i(uTextureSamplerLocation, 0);
 
     std::vector<glm::vec3> moonAxes;
     moonAxes.reserve(32);
@@ -117,8 +119,6 @@ int main()
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, earthTexture);
-        glUniform1i(uTextureSamplerLocation, 0);
-
         glm::mat4 ProjMatrix   = glm::perspective(glm::radians(70.f), ctx.aspect_ratio(), 0.1f, 100.f);
         glm::mat4 MVMatrix     = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
         MVMatrix               = glm::rotate(MVMatrix, ctx.time(), glm::vec3(0.f, 1.f, 0.f));
@@ -136,8 +136,8 @@ int main()
         // glUniformMatrix4fv(uMVMatrixLocation, 1, GL_FALSE, glm::value_ptr(MVMatrix));
         // glUniformMatrix4fv(uNormalMatrixLocation, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
         // glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+
         glBindTexture(GL_TEXTURE_2D, MoonTexture);
-        glUniform1i(uTextureSamplerLocation, 0);
 
         for (const auto& moonAxis : moonAxes)
         {
@@ -153,8 +153,10 @@ int main()
             MVMatrix = glm::scale(MVMatrix, glm::vec3{5.f});
             MVMatrix = glm::translate(MVMatrix, glm::vec3(2.f, 0.f, 0.f));
         }
-        glBindTexture(GL_TEXTURE_2D, 0);
         glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, 0); // débind sur l'unité GL_TEXTURE0
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, 0); // débind sur l'unité GL_TEXTURE1
         glBindVertexArray(0);
     };
 

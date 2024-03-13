@@ -1,15 +1,13 @@
 #version 330 core
 
-in vec2 vFragUV;  // Coordonnées de texture provenant du vertex shader
+in vec3 viewPosition;
+in vec3 viewNormal;
+in vec2 outTexCoords;
 
-out vec3 fragColor;  // Couleur de sortie du fragment shader
-
-uniform sampler2D uTexture;  // Variable uniforme pour la texture
+out vec4 fragColor;
 
 void main() {
-    // Utiliser la fonction texture pour lire la couleur de la texture aux coordonnées vFragUV
-    vec4 textureColor = texture(uTexture, vFragUV);
-
-    // Utiliser la couleur lue depuis la texture comme couleur de sortie
-    fragColor = textureColor.rgb;  // Convertir vec4 en vec3
+    
+    vec3 normalizedNormal = normalize(viewNormal);
+    fragColor = vec4(normalizedNormal, 1.0);
 }
