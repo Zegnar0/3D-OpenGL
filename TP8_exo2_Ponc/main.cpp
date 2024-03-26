@@ -18,7 +18,7 @@ int main()
 
     const p6::Shader shader = p6::load_shader(
         "shaders/3D.vs.glsl",
-        "shaders/directionalLight.fs.glsl"
+        "shaders/pointLight.fs.glsl"
     );
 
     GLuint vbo;
@@ -55,11 +55,10 @@ int main()
     GLuint uKdLocation             = glGetUniformLocation(shader.id(), "uKd");
     GLuint uKsLocation             = glGetUniformLocation(shader.id(), "uKs");
     GLuint uShininessLocation      = glGetUniformLocation(shader.id(), "uShininess");
-    GLuint uLightDir_vsLocation    = glGetUniformLocation(shader.id(), "uLightDir_vs");
+    GLuint uLightPos_vsLocation    = glGetUniformLocation(shader.id(), "uLightPos_vs");
     GLuint uLightIntensityLocation = glGetUniformLocation(shader.id(), "uLightIntensity");
 
     glEnable(GL_DEPTH_TEST);
-    // glUniform1i(uTextureSamplerLocation, 0);
 
     std::vector<glm::vec3> moonAxes;
     moonAxes.reserve(32);
@@ -104,36 +103,32 @@ int main()
         MVMatrix               = glm::rotate(MVMatrix, ctx.time(), glm::vec3(0.f, 1.f, 0.f));
         glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
 
+        glm::vec3 lightPos = glm::vec3(glm::rotate(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), ctx.time(), glm::vec3(0.0f, 1.0f, 0.0f)));
+        lightPos *= 5.0f; // Scale the position for a larger spiral
+
+        glm::vec3 lightPos_vs = glm::vec3(viewMatrix * glm::vec4(lightPos, 1.0f)); // Transform light position to view space
+
         glm::mat4 MVPMatrix = ProjMatrix * viewMatrix * MVMatrix;
 
         glUniformMatrix4fv(uMVPMatrixLocation, 1, GL_FALSE, glm::value_ptr(MVPMatrix));
         glUniformMatrix4fv(uMVMatrixLocation, 1, GL_FALSE, glm::value_ptr(MVMatrix));
         glUniformMatrix4fv(uNormalMatrixLocation, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
-        glUniform3f(uKdLocation, 0.6f, 0.2f, 0.3f);                                                        // Example values for diffuse reflectivity
-        glUniform3f(uKsLocation, 0.8f, 0.8f, 0.8f);                                                        // Example values for specular reflectivity
-        glUniform1f(uShininessLocation, 32.0f);                                                            // Example value for shininess
-        glm::vec3 lightDir_vs = glm::normalize(glm::vec3(viewMatrix * glm::vec4(1.0f, 1.0f, 1.0f, 0.0f))); // Transform light direction to view space
-        glUniform3fv(uLightDir_vsLocation, 1, glm::value_ptr(lightDir_vs));                                // Send transformed light direction
-        glUniform3f(uLightIntensityLocation, 1.0f, 1.0f, 1.0f);                                            // Example values for light intensity
+        glUniform3f(uKdLocation, 0.6f, 0.2f, 0.3f);                         // Example values for diffuse reflectivity
+        glUniform3f(uKsLocation, 0.8f, 0.8f, 0.8f);                         // Example values for specular reflectivity
+        glUniform1f(uShininessLocation, 32.0f);                             // Example value for shininess
+        glUniform3fv(uLightPos_vsLocation, 1, glm::value_ptr(lightPos_vs)); // Send transformed light position
+        glUniform3f(uLightIntensityLocation, 1.0f, 1.0f, 1.0f);             // Example values for light intensity
 
         glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
-        // MVMatrix = glm::rotate(MVMatrix, ctx.time(), {0.f, 1.f, 0.f});
-        // MVMatrix = glm::translate(MVMatrix, {-2.f, 0.f, 0.f});
-        // MVMatrix = glm::scale(MVMatrix, glm::vec3{0.2f});
-        // glUniformMatrix4fv(uMVPMatrixLocation, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
-        // glUniformMatrix4fv(uMVMatrixLocation, 1, GL_FALSE, glm::value_ptr(MVMatrix));
-        // glUniformMatrix4fv(uNormalMatrixLocation, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
-        // glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-
         for (const auto& moonAxis : moonAxes)
         {
-            // Générer des valeurs de matériaux aléatoires pour chaque sphère
+            // Generate random material values for each sphere
             glm::vec3 randomKd        = glm::linearRand(glm::vec3(0.0f), glm::vec3(1.0f));
             glm::vec3 randomKs        = glm::linearRand(glm::vec3(0.0f), glm::vec3(1.0f));
             float     randomShininess = glm::linearRand(1.0f, 128.0f);
 
-            // Appliquer les valeurs de matériaux aléatoires
+            // Apply random material values
             glUniform3f(uKdLocation, randomKd.r, randomKd.g, randomKd.b);
             glUniform3f(uKsLocation, randomKs.r, randomKs.g, randomKs.b);
             glUniform1f(uShininessLocation, randomShininess);
@@ -153,9 +148,9 @@ int main()
             MVMatrix = glm::translate(MVMatrix, glm::vec3(2.f, 0.f, 0.f));
         }
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, 0); // débind sur l'unité GL_TEXTURE0
+        glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture unit GL_TEXTURE0
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, 0); // débind sur l'unité GL_TEXTURE1
+        glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture unit GL_TEXTURE1
         glBindVertexArray(0);
     };
 
